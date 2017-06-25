@@ -80,7 +80,7 @@ class Guahao(object):
     """
 
     def __init__(self):
-        itchat.auto_login(hotReload=True)
+        itchat.auto_login(hotReload=True, enableCmdQR=2)
         self.browser = Browser()
         self.dutys = ""
         self.refresh_time = ''
