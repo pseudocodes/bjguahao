@@ -57,11 +57,11 @@ class Browser(object):
         Log.debug("post data :" + str(data))
         if ref:
             self.session.headers['Referer'] = ref
-        print 'headers before', self.session.headers
-        print 'cookies before', self.session.cookies 
+        # print 'headers before', self.session.headers
+        # print 'cookies before', self.session.cookies 
         response = self.session.post(url, data=data)
         if response.status_code == 200:
             self.session.headers['Referer'] = response.url
-            print 'after', self.session.headers
-            print 'after', self.session.cookies
+            # print 'after', self.session.headers
+            # print 'after', self.session.cookies
         return response

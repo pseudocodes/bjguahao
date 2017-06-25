@@ -148,8 +148,9 @@ class Guahao(object):
             if data["msg"] == "OK" and data["hasError"] == False and data["code"] == 200:
                 self.dutys = data["data"]
 
-        except Exception, e:
-            Log.exit(repr(e))
+        except Exception as e:
+            # Log.exit(repr(e))
+            Log.error(repr(e))
 
         if len(self.dutys) == 0:
             return "NotReady"
@@ -158,7 +159,7 @@ class Guahao(object):
 
         if self.config.doctor_id and self.config.doctor_id != "":
             for doctor in self.dutys[::-1]:
-                if doctor['doctorId'] == self.doctor_id:
+                if doctor['doctorId'] == self.config.doctor_id:
                     if doctor['remainAvailableNumber']:
                         Log.info(u"选中:" + str(doctor["doctorName"]))
                         return doctor
@@ -200,7 +201,7 @@ class Guahao(object):
         hospital_id = self.config.hospital_id
         department_id = self.config.department_id
         # patient_id = self.config.patient_id
-        patient_id = '203166178'
+        patient_id = self.config.patient_id
         doctor_id = str(doctor['doctorId'])
 
         preload = {
@@ -329,7 +330,7 @@ class Guahao(object):
             sleep_time = seconds - 60
             if sleep_time > 0:
                 Log.info("程序休眠" + str(sleep_time) + "秒后开始运行")
-                time.sleep(sleep_time)
+                # time.sleep(sleep_time)
 
         doctor = ""
 
@@ -340,7 +341,7 @@ class Guahao(object):
                 break
             elif doctor == "NotReady":
                 Log.info("好像还没放号？重试中")
-                time.sleep(0.1)
+                time.sleep(0.5)
             else:
                 
                 self.send_wechat(doctor)
