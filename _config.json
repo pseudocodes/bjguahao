@@ -1,12 +1,14 @@
 [
     {
-        "username":"185xxxxxxx",
-        "password":"*******",
-        "date":"2017-02-17",            
+        "username":"",
+        "password":"",
+        "date":"2017-07-03",            
         "hospitalId":"142",      
         "departmentId":"200039602",
         "dutyCode":"1",
         "patientName":"",
+        "patientID": "",
+        "doctorID": "",
 
 
         "DebugLevel":"info"

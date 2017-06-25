@@ -8,10 +8,11 @@ import pickle
 import requests
 import requests.utils
 
-from log import  Log
+from log import Log
 
 reload(sys)
-sys.setdefaultencoding( "utf-8" )
+sys.setdefaultencoding("utf-8")
+
 
 class Browser(object):
     """
@@ -26,7 +27,6 @@ class Browser(object):
         }
         self.root_path = os.path.dirname(os.path.realpath(sys.argv[0]))
 
-
     def load_cookies(self, path):
         with open(path, 'rb') as f:
             self.session.cookies = requests.utils.cookiejar_from_dict(pickle.load(f))
@@ -36,23 +36,32 @@ class Browser(object):
             cookies_dic = requests.utils.dict_from_cookiejar(self.session.cookies)
             pickle.dump(cookies_dic, f)
 
-    def get(self, url, data):
+    def get(self, url, data, ref=None):
         """
         http get
         """
-        pass
+        if ref:
+            self.session.headers['Referer'] = ref
         response = self.session.get(url)
         if response.status_code == 200:
-			self.session.headers['Referer'] = response.url
+            self.session.headers['Referer'] = url
+            referer = self.session.headers['Referer']
+            Log.debug('get url {}, ref {} response {}'.format(url, referer, response.url))
+            print self.session.cookies
         return response
 
-    def post(self, url, data):
+    def post(self, url, data, ref=None):
         """
         http post
         """
-        Log.debug("post data :" +  str(data))
+        Log.debug("post data :" + str(data))
+        if ref:
+            self.session.headers['Referer'] = ref
+        print 'headers before', self.session.headers
+        print 'cookies before', self.session.cookies 
         response = self.session.post(url, data=data)
         if response.status_code == 200:
             self.session.headers['Referer'] = response.url
+            print 'after', self.session.headers
+            print 'after', self.session.cookies
         return response
-

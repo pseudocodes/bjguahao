@@ -4,6 +4,8 @@
 import time
 import json
 import sys
+import os
+import inspect
 
 
 reload(sys)
@@ -79,7 +81,7 @@ class Log(object):
         global debug_level
         msg = Log.set_encoding(msg)
         if debug_level <= Debug_level.info:
-            print("\033[0;37m " + Log.get_time()  + " [info] " + msg  + "\033[0m")
+            print("\033[0;37m " + Log.get_time() + " [info] " + msg + "\033[0m")
 
     @staticmethod
     def debug(msg):
@@ -87,9 +89,19 @@ class Log(object):
         debug
         """
         global debug_level
+        callerframerecord = inspect.stack()[1]
+        frame = callerframerecord[0]
+        info = inspect.getframeinfo(frame)
         msg = Log.set_encoding(msg)
         if debug_level <= Debug_level.debug:
-            print("\033[0;34m " + Log.get_time()  + " [debug] " + msg  + "\033[0m")
+            # fname = os.path.basename(sys._getframe(1).co_filename)
+
+            fname = os.path.basename(info.filename) 
+            lineno = sys._getframe().f_back.f_lineno
+
+            out = "\033[0;34m {} [debug] {}:{} {} \033[0m"
+            print(out.format(Log.get_time(), fname, lineno, msg))
+            # print("\033[0;34m " + Log.get_time() + " [debug] " + msg + "\033[0m")
 
 
     @staticmethod
@@ -98,9 +110,18 @@ class Log(object):
         输出错误
         """
         global debug_level
+        
+        callerframerecord = inspect.stack()[1]
+        frame = callerframerecord[0]
+        info = inspect.getframeinfo(frame)
+     
         msg = Log.set_encoding(msg)
         if debug_level <= Debug_level.error:
-            print("\033[0;31m " + Log.get_time()  + " [error] " + msg  + "\033[0m")
+            fname = os.path.basename(info.filename)
+            lineno = sys._getframe().f_back.f_lineno
+            out = "\033[0;31m {} [error] {}:{} {} \033[0m"
+            print(out.format(Log.get_time(), fname, lineno, msg))
+            # print("\033[0;31m " + Log.get_time()  + " [error] " + msg  + "\033[0m")
 
     @staticmethod
     def exit(msg):

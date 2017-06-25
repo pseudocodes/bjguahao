@@ -11,7 +11,8 @@
 |yzm|是个谜，不影响|空|
 |isAjax|是个谜，不影响|true|
 
-抓包
+抓包  
+
 ```
 POST /quicklogin.htm HTTP/1.1
 Host: www.bjguahao.gov.cn
@@ -40,6 +41,7 @@ mobileNo=185********&password=********&yzm=&isAjax=true
 |msg|是否登陆成功(重要)|OK|
 
 抓包(登陆成功)
+  
 ```
 HTTP/1.1 200 OK
 Set-Cookie: JSESSIONID=8154A5F2CFA1A140155CCAD2A13480B2; Path=/; HttpOnly
@@ -55,6 +57,7 @@ Server: Tengine/2.1.2
 ```
 
 抓包(登陆失败)
+
 ```
 
 ```
@@ -67,6 +70,7 @@ Server: Tengine/2.1.2
 |dutyCode|上午下午|1表示上午，2表示下午|
 |dutyDate|挂号日期|2017-03-13|
 |isAjax|是个谜|true就好|
+
 ```
 POST /dpt/partduty.htm HTTP/1.1
 Host: www.bjguahao.gov.cn
