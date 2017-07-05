@@ -12,6 +12,7 @@ import time
 import datetime
 
 import itchat
+import arrow
 
 from log import Log
 from browser import Browser
@@ -80,7 +81,7 @@ class Guahao(object):
     """
 
     def __init__(self):
-        itchat.auto_login(hotReload=True)
+        # itchat.auto_login(hotReload=True, enableCmdQR=2)
         self.browser = Browser()
         self.dutys = ""
         self.refresh_time = ''
@@ -176,10 +177,10 @@ class Guahao(object):
         Log.info("当前号余量:")
         x = PrettyTable()
         x.border = True
-        x.field_names = ["医生姓名", "擅长", "号余量"]
+        x.field_names = ["医生姓名", "擅长", "号余量", "费用"]
         for doctor in self.dutys:
             x.add_row(
-                [doctor["doctorName"], doctor['skill'], doctor['remainAvailableNumber']])
+                [doctor["doctorName"], doctor['skill'], doctor['remainAvailableNumber'], ['totalFee']])
         print x.get_string()
         pass
     
@@ -274,10 +275,12 @@ class Guahao(object):
         appoint_day = m.group('appointDay')
 
         today = datetime.date.today()
-
+        print today
         con_data_str = self.config.date + " " + refresh_time + ":00"
+        print con_data_str
         self.start_time = datetime.datetime.strptime(
             con_data_str, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(days=- int(appoint_day))
+        print self.start_time
         self.stop_date = today + datetime.timedelta(days=int(appoint_day))
 
         Log.info("放号时间: " + self.start_time.strftime("%Y-%m-%d %H:%M"))
@@ -311,7 +314,58 @@ class Guahao(object):
         Log.debug(req_url)
         self.browser.get(req_url, '')
         
+    
+    def display(self):
+        config = Config()
+        config.load_conf()
+        self.config = config
 
+        self.auth_login()                       # 1. 登陆
+        
+        now = arrow.now()
+        for d in xrange(1, 7):
+            time.sleep(0.3)
+            day = now.shift(days=d).format('YYYY-MM-DD').encode('utf-8')
+            print day
+            preload = {
+                'hospitalId': '142',
+                'departmentId': '200039524',
+                'dutyCode': "1",
+                'dutyDate': day,
+                'isAjax': True
+            }
+            response = self.browser.post(self.get_doctor_url, data=preload)
+            Log.debug("response data:" + response.text)
+            dutys = []
+            Log.debug(str(response.status_code))
+            try:
+                data = json.loads(response.text)
+                if data["msg"] == "OK" and data["hasError"] == False and data["code"] == 200:
+                    dutys = data["data"]
+
+            except Exception as e:
+                # Log.exit(repr(e))
+                Log.error(repr(e))
+
+            if len(dutys) == 0:
+                continue
+            Log.debug(day)
+            self.display_doctors(dutys)
+            
+
+
+    def display_doctors(self, dutys):
+
+        Log.info("当前号余量:")
+        x = PrettyTable()
+        x.border = True
+        x.field_names = ["医生姓名", "擅长", "号余量", "费用"]
+        for doctor in dutys:
+            x.add_row(
+                [doctor["doctorName"], doctor['skill'], doctor['remainAvailableNumber'], doctor['totalFee']])
+        print x.get_string()
+        pass
+ 
     def run(self):
         """主逻辑"""
 
@@ -320,8 +374,8 @@ class Guahao(object):
         self.config = config
         self.get_duty_time()
 
-        
         self.auth_login()                       # 1. 登陆
+        
 
         if self.start_time > datetime.datetime.now():
             seconds = (
@@ -330,10 +384,10 @@ class Guahao(object):
             sleep_time = seconds - 60
             if sleep_time > 0:
                 Log.info("程序休眠" + str(sleep_time) + "秒后开始运行")
-                # time.sleep(sleep_time)
+                time.sleep(sleep_time)
 
         doctor = ""
-
+        return  
         while True:
             doctor = self.select_doctor()            # 2. 选择医生
             if doctor == "NoDuty":
@@ -341,7 +395,7 @@ class Guahao(object):
                 break
             elif doctor == "NotReady":
                 Log.info("好像还没放号？重试中")
-                time.sleep(0.5)
+                time.sleep(1)
             else:
                 
                 self.send_wechat(doctor)
@@ -358,4 +412,5 @@ class Guahao(object):
 if __name__ == "__main__":
     Log.load_config()
     guahao = Guahao()
-    guahao.run()
+    # guahao.run()
+    guahao.display()
