@@ -81,7 +81,7 @@ class Guahao(object):
     """
 
     def __init__(self):
-        itchat.auto_login(hotReload=True, enableCmdQR=2)
+        # itchat.auto_login(hotReload=True, enableCmdQR=2)
         self.browser = Browser()
         self.dutys = ""
         self.refresh_time = ''
@@ -177,10 +177,10 @@ class Guahao(object):
         Log.info("当前号余量:")
         x = PrettyTable()
         x.border = True
-        x.field_names = ["医生姓名", "擅长", "号余量", "费用"]
+        x.field_names = ["医生姓名", "id", "擅长", "号余量", "费用"]
         for doctor in self.dutys:
             x.add_row(
-                [doctor["doctorName"], doctor['skill'], doctor['remainAvailableNumber'], ['totalFee']])
+                [doctor["doctorName"], doctor['doctorId'], doctor['skill'], doctor['remainAvailableNumber'], doctor['totalFee']])
         print x.get_string()
         pass
     
@@ -359,10 +359,10 @@ class Guahao(object):
         Log.info("当前号余量:")
         x = PrettyTable()
         x.border = True
-        x.field_names = ["医生姓名", "擅长", "号余量", "费用"]
+        x.field_names = ["医生姓名", "id", "擅长", "号余量", "费用"]
         for doctor in dutys:
             x.add_row(
-                [doctor["doctorName"], doctor['skill'], doctor['remainAvailableNumber'], doctor['totalFee']])
+                [doctor["doctorName"], doctor['doctorId'], doctor['skill'], doctor['remainAvailableNumber'], doctor['totalFee']])
         print x.get_string()
         pass
  
@@ -381,13 +381,12 @@ class Guahao(object):
             seconds = (
                 self.start_time - datetime.datetime.now()).total_seconds()
             Log.info("距离放号时间还有" + str(seconds) + "秒")
-            sleep_time = seconds - 60
+            sleep_time = seconds - 30
             if sleep_time > 0:
                 Log.info("程序休眠" + str(sleep_time) + "秒后开始运行")
                 time.sleep(sleep_time)
 
         doctor = ""
-        return  
         while True:
             doctor = self.select_doctor()            # 2. 选择医生
             if doctor == "NoDuty":
@@ -412,5 +411,5 @@ class Guahao(object):
 if __name__ == "__main__":
     Log.load_config()
     guahao = Guahao()
-    # guahao.run()
-    guahao.display()
+    guahao.run()
+    # guahao.display()
